@@ -1,9 +1,31 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import queryString from "query-string";
+import axios from "axios";
 import io from "socket.io-client";
 
+let socket;
+
 const Chat = () => {
-  return <h1>Chat</h1>;
+  const location = useLocation();
+  const [name, setname] = useState("");
+  const [room, setRoom] = useState("");
+  const ENDPOINT = "http://localhost:5000";
+
+  useEffect(() => {
+    const { name, room } = queryString.parse(location.search);
+    socket = io(ENDPOINT, {
+      withCredentials: true,
+    });
+
+    setname(name);
+    setRoom(room);
+  }, [ENDPOINT, location.search]);
+  return (
+    <div>
+      <h1>Chat</h1>
+    </div>
+  );
 };
 
 export default Chat;

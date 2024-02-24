@@ -1,25 +1,31 @@
+const http = require("http");
 const express = require("express");
 const socketio = require("socket.io");
-const http = require("http");
-
-const PORT = process.env.PORT || 5000;
+const cors = require("cors");
 const router = require("./router");
 
 const app = express();
+app.use(cors());
 
 const server = http.createServer(app);
-const io = socketio(server);
-
-io.on("connection", (socket) => {
-  console.log("User connected!");
-
-  socket.on("disconnect", () => {
-    console.log("User disconnected!");
-  });
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
 });
 
 app.use(router);
 
-server.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+io.on("connect", (socket) => {
+  console.log("User connected");
+
+  socket.on("disconnection", () => {
+    console.log("User disconnected");
+  });
+});
+
+server.listen(process.env.PORT || 5000, () => {
+  console.log(`Server has started.`);
 });
