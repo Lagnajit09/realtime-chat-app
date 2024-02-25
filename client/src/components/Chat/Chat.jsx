@@ -20,6 +20,14 @@ const Chat = () => {
 
     setname(name);
     setRoom(room);
+
+    socket.emit("join", { name, room }, () => {});
+
+    return () => {
+      socket.emit("disconnect");
+
+      socket.off();
+    };
   }, [ENDPOINT, location.search]);
   return (
     <div>

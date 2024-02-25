@@ -21,6 +21,10 @@ app.use(router);
 io.on("connect", (socket) => {
   console.log("User connected");
 
+  socket.on("join", ({ name, room }, callback) => {
+    console.log(name, room);
+  });
+
   socket.on("disconnection", () => {
     console.log("User disconnected");
   });
