@@ -3,6 +3,11 @@ import { useLocation } from "react-router-dom";
 import queryString from "query-string";
 import axios from "axios";
 import io from "socket.io-client";
+import InfoBar from "../InfoBar/InfoBar";
+import "./Chat.css";
+import Input from "../Input/Input";
+import Messages from "../Messages/Messages";
+import TextContainer from "../TextContainer/TextConatiner";
 
 let socket;
 
@@ -12,6 +17,8 @@ const Chat = () => {
   const [room, setRoom] = useState("");
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
+  const [users, setUsers] = useState("");
+
   const ENDPOINT = "http://localhost:5000";
 
   useEffect(() => {
@@ -33,27 +40,37 @@ const Chat = () => {
   }, [ENDPOINT, location.search]);
 
   useEffect(() => {
-    socket.on("message", (message) => setMessages([...messages, message]));
-  }, [messages]);
+    socket.on("message", (message) => {
+      setMessages((prevMessages) => [...prevMessages, message]);
+    });
+    socket.on("roomData", ({ users }) => {
+      setUsers(users);
+    });
+  }, []);
 
   const sendMessage = (event) => {
     event.preventDefault();
+
     if (message) {
-      socket.emit("sendMessage", message, () => sendMessage(""));
+      socket.emit("sendMessage", message, () => setMessage(""));
     }
   };
 
   console.log(message, messages);
 
   return (
-    <div className="outerConatiner">
+    <div className="outerContainer">
       <div className="container">
-        <input
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyPress={(e) => (e.key === "Enter" ? sendMessage(e) : null)}
+        <InfoBar room={room} />
+        <Messages messages={messages} name={name} />
+
+        <Input
+          message={message}
+          setMessage={setMessage}
+          sendMessage={sendMessage}
         />
       </div>
+      {/* <TextContainer users={users} /> */}
     </div>
   );
 };
